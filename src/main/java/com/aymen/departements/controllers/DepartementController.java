@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -24,11 +25,13 @@ import com.aymen.departements.service.ParcoursService;
 
 
 
+
+
 @Controller
 public class DepartementController {
 	@Autowired
 	DepartementService produitService;
-
+	ParcoursService parcoursService;
 	
 	
 	@RequestMapping("/showCreate")
@@ -66,6 +69,11 @@ public class DepartementController {
 		modelMap.addAttribute("produits", prods);
 
 		modelMap.addAttribute("pages", new int[prods.getTotalPages()]);
+		
+		List<Parcours> cats = produitService.getAllParcourss();
+		modelMap.addAttribute("parcours", cats);
+
+		modelMap.addAttribute("currentPage", page);
 
 		modelMap.addAttribute("currentPage", page);
 		return "listeDepartements";
@@ -130,6 +138,28 @@ return "listeDepartements";
     	  modelMap.addAttribute("Produits",prods);
     	  
     	  return "resultat";}
+	
+	
+	
+	@RequestMapping("/chercherCat")
+	  public String chercherCat(@RequestParam("idCat") int idCat,
+	    		ModelMap modelMap,
+	    		@RequestParam (name="page",defaultValue = "0") int page,
+	    		@RequestParam (name="size", defaultValue = "2") int size)
+	    {     
+		 	
+	    	  List <Departement> weapens = produitService.getAllDepartements();
+	    	  weapens = weapens.stream()
+	                  .filter(x -> x.getParcours().getIdPar() == idCat)
+	                  .collect(Collectors.toList());
+	    	  modelMap.addAttribute("produits",weapens);
+	    	 List<Parcours> cats = produitService.getAllParcourss();
+	    		modelMap.addAttribute("parcours", cats);
+	    	
+	    		modelMap.addAttribute("currentPage", page);
+	    	  
+	    	  return "listeDepartements";
+	    }  
 	
 	
 }
